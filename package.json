@@ -1,0 +1,39 @@
+{
+  "name": "callbook",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CallBook — sealed calls on Sui, per-voice credibility remembered in Walrus Memory",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "smoke": "node --experimental-strip-types scripts/smoke.ts",
+    "mcp": "node --env-file=.env --experimental-strip-types --no-warnings mcp/server.ts",
+    "mcp-check": "node --env-file=.env --experimental-strip-types --no-warnings scripts/mcp-check.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@mysten-incubation/memwal": "^0.1.12",
+    "@mysten/seal": "^1.5.2",
+    "@mysten/sui": "^2.38.0",
+    "@mysten/wallet-standard": "^0.21.36",
+    "@mysten/walrus": "^1.2.37",
+    "@upstash/redis": "^1.41.0",
+    "next": "^15.5.28",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.7.0"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  }
+}

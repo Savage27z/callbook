@@ -1,0 +1,13 @@
+node_modules
+.next
+.env
+.env.local
+data/
+*.tsbuildinfo
+next-env.d.ts
+
+.vercel
+
+# local practice-mode data and tooling
+data-preview/
+.claude/
