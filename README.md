@@ -4,6 +4,7 @@
 
 Built for the **Tatum x Walrus "Total Recall" hackathon**, track **Markets & Sports Prediction**.
 
+- Repository: https://github.com/Savage27z/callbook
 - Live app: https://callbook-jade.vercel.app
 - Blog post: _add the published post here_
 - Demo video: _add the link here_
@@ -124,6 +125,10 @@ In both cases the working copy is disposable: when it is empty the app **rebuild
 ## Stack
 
 Next.js, TypeScript, `@mysten-incubation/memwal`, `@mysten/sui` (GraphQL client), `@mysten/wallet-standard`, `@modelcontextprotocol/sdk`, `@upstash/redis` (serverless deployments).
+
+## License
+
+MIT. See [LICENSE](LICENSE). The license covers this repository's code; the hotlinked landing-page artwork described below is not covered by it.
 
 ## Credits
 
