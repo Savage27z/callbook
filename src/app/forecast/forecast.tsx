@@ -16,7 +16,7 @@ interface State {
   resolved: Record<string, boolean>;
   consensus: Consensus[];
   history: { marketId: string; weights: Record<string, number> }[];
-  viewer: { address: string; voiceId: string } | null;
+  viewer: { address: string; voiceId: string; guest?: boolean } | null;
 }
 
 async function api<T>(url: string, body?: unknown): Promise<T> {
@@ -27,7 +27,7 @@ async function api<T>(url: string, body?: unknown): Promise<T> {
 }
 
 const pct = (x: number, d = 0) => `${(x * 100).toFixed(d)}%`;
-const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+const short = (a: string) => (a.startsWith("guest-") ? `Guest ${a.slice(-4).toUpperCase()}` : `${a.slice(0, 6)}…${a.slice(-4)}`);
 
 function closesIn(iso: string, now: number): string {
   const ms = Date.parse(iso) - now;
@@ -107,6 +107,10 @@ export default function Forecast() {
   }
 
   const list = tab === "open" ? d.open : d.answered;
+  // Top 10, plus the signed-in player's own row if they are further down.
+  const boardRows = d.board.slice(0, 10);
+  const mine = d.board.find((v) => v.id === myId);
+  if (mine && !boardRows.includes(mine)) boardRows.push(mine);
 
   return (
     <div className="cb">
@@ -280,7 +284,7 @@ export default function Forecast() {
               <span className="count">{d.board.length} forecasters</span>
             </div>
             {d.board.length === 0 && <p className="empty small">No forecasters yet.</p>}
-            {d.board.slice(0, 10).map((v, i) => {
+            {boardRows.map((v, i) => {
               const w = d.byVoice.get(v.id);
               const t = tag(w);
               return (

@@ -8,6 +8,20 @@ import { listSuiWallets, onWalletsChange, signInWithWallet } from "./wallet.ts";
 export function WalletModal({ onClose, onDone }: { onClose: () => void; onDone: (address: string) => void }) {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [busy, setBusy] = useState("");
+  async function guest() {
+    setBusy("guest");
+    setErr("");
+    try {
+      const res = await fetch("/api/auth/guest", { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Could not start a guest session");
+      onDone(json.address as string);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy("");
+    }
+  }
   const [err, setErr] = useState("");
   useEffect(() => {
     const update = () => setWallets(listSuiWallets());
@@ -29,11 +43,16 @@ export function WalletModal({ onClose, onDone }: { onClose: () => void; onDone: 
     <div className="modal-back" onClick={onClose}>
       <div className="modal" role="dialog" aria-modal="true" aria-label="Sign in with a wallet" onClick={(e) => e.stopPropagation()}>
         <div className="diff-head">
-          <h2>Sign in with a Sui wallet</h2>
+          <h2>Start predicting</h2>
           <button className="x" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
+        <button className="btn guest-btn" disabled={busy !== ""} onClick={guest}>
+          {busy === "guest" ? "Starting…" : "Continue as guest"}
+        </button>
+        <p className="modal-note">No wallet needed. Your record is tied to this browser, so clearing your cookies starts you over.</p>
+        <p className="modal-or">or use a Sui wallet</p>
         <p className="modal-note">You sign one free message to prove the wallet is yours. No transaction is sent and nothing is spent.</p>
         {wallets.length === 0 ? (
           <p className="insight">

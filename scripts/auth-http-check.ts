@@ -28,9 +28,11 @@ const state = async (cookie: string | null) =>
     calls: { marketId: string; voiceId: string; p: number }[];
     voices: { id: string; name: string; kind: string }[];
     consensus: { marketId: string; nCalls: number }[];
-    viewer: { address: string; voiceId: string } | null;
+    viewer: { address: string; voiceId: string; guest?: boolean } | null;
   };
 
+const players = async () => (await state(null)).voices.filter((v) => v.kind === "user").length;
+const playersBefore = await players();
 const a = await login(Ed25519Keypair.generate());
 const b = await login(Ed25519Keypair.generate());
 
@@ -50,5 +52,14 @@ assert.equal(sa.viewer?.voiceId?.startsWith("w-"), true);
 assert.equal(sa.calls.filter((c) => c.marketId === market.id).length, 1, "a player sees only their own open prediction");
 assert.equal(anon.calls.filter((c) => c.marketId === market.id).length, 0, "visitors see none");
 assert.equal(sa.consensus.find((c) => c.marketId === market.id)?.nCalls, 2, "both count toward the community forecast");
-assert.equal(sa.voices.filter((v) => v.kind === "user").length, 2);
-console.log("sign-in + predictions OK");
+assert.equal((await players()) - playersBefore, 2, "two new players so far");
+
+// A guest (no wallet) can play too, and counts as one more player.
+const gres = await fetch(`${base}/api/auth/guest`, { method: "POST" });
+assert.equal(gres.status, 200);
+const gcookie = gres.headers.getSetCookie().find((c) => c.startsWith("cb_session="))!.split(";")[0];
+assert.equal((await post(gcookie, "/api/predict", { marketId: market.id, p: 0.5 })).status, 200, "a guest can lock in a prediction");
+const sg = await state(gcookie);
+assert.equal(sg.viewer?.guest, true);
+assert.equal((await players()) - playersBefore, 3, "the guest is the third new player");
+console.log("sign-in + guest + predictions OK");

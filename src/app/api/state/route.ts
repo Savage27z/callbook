@@ -1,5 +1,5 @@
 import { readAccess } from "@/lib/access.ts";
-import { sessionFrom, voiceIdFor } from "@/lib/auth.ts";
+import { isGuest, sessionFrom, voiceIdFor } from "@/lib/auth.ts";
 import { getState } from "@/lib/ledger.ts";
 import { handle } from "@/lib/http.ts";
 
@@ -17,6 +17,6 @@ export const GET = (req: Request) =>
       ...(await getState(a.ns, viewerVoiceId)),
       admin: a.canWrite,
       adminRequired: a.adminRequired,
-      viewer: s ? { address: s.address, voiceId: viewerVoiceId } : null,
+      viewer: s ? { address: s.address, voiceId: viewerVoiceId, guest: isGuest(s.address) } : null,
     };
   });

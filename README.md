@@ -17,7 +17,7 @@ Built for the **Tatum x Walrus "Total Recall" hackathon**, track **Markets & Spo
 
 Two kinds of forecasters share one leaderboard:
 
-- **Players** sign in with a Sui wallet at `/app` and predict for themselves.
+- **Players** predict for themselves at `/app`. They can sign in with a Sui wallet or simply **continue as a guest** (no wallet needed).
 - **Experts** (forecasting sites, pundits, models) are logged by the operator, who transcribes the number each one published at the time. This is labelled as such.
 
 | Address | What it is |
@@ -68,7 +68,8 @@ The expert numbers were taken from the forecasters' published pages (via search 
 
 - **Experts are transcribed by the operator.** Poliwave and Decision Desk HQ do not use CallBook; the operator records what they published. Players predict for themselves.
 - **Player records are hosted by the app**, in the operator's Walrus namespace, not in each player's own Walrus account. They are not user-owned memory. Wallet sign-in proves a wallet is yours; it does not yet sign each individual prediction, so attribution rests on the server.
-- **Sign-in is untested with a real browser wallet in this repo's automated tests.** Signature verification, sessions and per-wallet rules are tested with generated keys. Google-login (zkLogin) wallet accounts are supported in code but unverified.
+- **Guest players are not verified identities.** A guest is a random id bound to one browser by a signed cookie; clearing cookies starts over. Wallet sign-in proves control of a wallet.
+- **Sign-in is untested with a real browser wallet in this repo's automated tests.** Signature verification, sessions and per-wallet rules are tested with generated keys. Google-login (zkLogin) wallet accounts are supported in code but unverified. Real Slush sign-in was verified by hand on localhost; Slush flagged the `vercel.app` address as unsafe (a false positive), which is why guest sign-in exists.
 - **Writes are slow by nature:** a Walrus write takes roughly 20 to 25 seconds. The app queues writes and shows "saving…" until each lands.
 - **Each prediction costs the operator a small amount of SUI** (about 0.0001 SUI per seal, measured once). Players are limited to one prediction per question and the player count is capped.
 - Expert numbers for Iowa, Texas and Ohio were not logged because the sources published conflicting snapshots.

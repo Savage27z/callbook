@@ -98,9 +98,14 @@ export function userNamespace(address: string): string {
   return `u-${createHash("sha256").update(normalizeSuiAddress(address)).digest("hex").slice(0, 32)}`;
 }
 
-/** A signed-in player's forecaster id on the shared ledger. */
-export function voiceIdFor(address: string): string {
-  return `w-${createHash("sha256").update(normalizeSuiAddress(address)).digest("hex").slice(0, 12)}`;
+/** A guest has no wallet: a random id bound to this browser by the signed session cookie. */
+export const newGuestId = () => `guest-${randomBytes(6).toString("hex")}`;
+export const isGuest = (subject: string) => subject.startsWith("guest-");
+
+/** A signed-in player's forecaster id on the shared ledger (wallet address or guest id). */
+export function voiceIdFor(subject: string): string {
+  if (isGuest(subject)) return `g-${createHash("sha256").update(subject).digest("hex").slice(0, 12)}`;
+  return `w-${createHash("sha256").update(normalizeSuiAddress(subject)).digest("hex").slice(0, 12)}`;
 }
 
-export const shortAddress = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+export const shortAddress = (subject: string) => (isGuest(subject) ? `Guest ${subject.slice(-4).toUpperCase()}` : `${subject.slice(0, 6)}…${subject.slice(-4)}`);

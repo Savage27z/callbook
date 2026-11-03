@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { createSessionToken, newNonce, readSessionToken, signInMessage, userNamespace, verifySignIn } from "../src/lib/auth.ts";
+import { createSessionToken, isGuest, newGuestId, newNonce, readSessionToken, shortAddress, signInMessage, userNamespace, verifySignIn, voiceIdFor } from "../src/lib/auth.ts";
 
 async function signIn(kp: Ed25519Keypair, message = signInMessage(newNonce())) {
   const { signature } = await kp.signPersonalMessage(new TextEncoder().encode(message));
@@ -52,4 +52,16 @@ test("each wallet gets its own stable ledger namespace", () => {
   assert.equal(userNamespace(a), userNamespace(a));
   assert.notEqual(userNamespace(a), userNamespace(b));
   assert.match(userNamespace(a), /^u-[0-9a-f]{32}$/);
+});
+
+test("guests get a signed session, a stable id, and a different voice id from any wallet", () => {
+  const g = newGuestId();
+  assert.ok(isGuest(g));
+  assert.equal(readSessionToken(createSessionToken(g)), g);
+  assert.equal(readSessionToken(createSessionToken(g) + "x"), null);
+  assert.equal(voiceIdFor(g), voiceIdFor(g));
+  assert.notEqual(voiceIdFor(g), voiceIdFor(newGuestId()));
+  assert.match(voiceIdFor(g), /^g-[0-9a-f]{12}$/);
+  assert.match(voiceIdFor("0x" + "ab".repeat(32)), /^w-[0-9a-f]{12}$/);
+  assert.match(shortAddress(g), /^Guest [0-9A-F]{4}$/);
 });
