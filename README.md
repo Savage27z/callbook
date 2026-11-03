@@ -98,7 +98,7 @@ Without keys the app runs in **practice mode**: in-memory Walrus mock, simulated
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | Only on serverless hosts: the Redis database that holds the shared working copy |
 
 ```bash
-npm test              # 34 tests: scoring, sign-in, sessions, per-player rules, ledger behaviour, redis store and locks
+npm test              # 36 tests: scoring, sign-in, guests, sessions, per-player rules, privacy, ledger behaviour, redis store and locks
 npm run smoke         # end-to-end ledger run (practice mode)
 npm run build && npm start
 ```

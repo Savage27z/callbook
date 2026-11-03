@@ -86,3 +86,18 @@ test("players cannot predict a closed or unknown question", async () => {
   await assert.rejects(L.predict(ns, "0x" + "c3".repeat(32), "w-carol", "Carol", past.id, 0.5), /closed/);
   await assert.rejects(L.predict(ns, "0x" + "c3".repeat(32), "w-carol", "Carol", "nope", 0.5), /Unknown question/);
 });
+
+test("the public state never contains wallet addresses or guest ids", async () => {
+  const ns = L.FEATURED_NS;
+  const m = await L.addMarket(ns, "Privacy check?", "meta", closes);
+  const wallet = "0x" + "e5".repeat(32);
+  await L.predict(ns, wallet, "w-priv", "Pat", m.id, 0.6);
+  await L.predict(ns, "guest-abc123def456", "g-priv", "Guest F456", m.id, 0.4);
+  const mine = JSON.stringify(await L.getState(ns, "w-priv"));
+  const anon = JSON.stringify(await L.getState(ns));
+  for (const body of [mine, anon]) {
+    assert.equal(body.includes(wallet), false, "no wallet address");
+    assert.equal(body.includes("guest-abc123def456"), false, "no guest id");
+    assert.equal(body.includes('"owner"'), false, "no owner field at all");
+  }
+});

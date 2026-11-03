@@ -418,7 +418,8 @@ export async function getState(ns: string, viewerVoiceId?: string) {
     pendingWrites,
     lastWriteError: c.lastWriteError,
     callStored,
-    voices,
+    // Wallet addresses and guest ids stay server-side: the public API never returns `owner`.
+    voices: voices.map(({ owner: _owner, ...v }) => v),
     weights: weights(view, includeSim),
     markets: [...view.markets.values()],
     // While a question is open, other players' predictions stay private (no herding); experts' stay public.
@@ -427,7 +428,7 @@ export async function getState(ns: string, viewerVoiceId?: string) {
       if (call.voiceId === viewerVoiceId) return true;
       const v = voices.find((x) => x.id === call.voiceId);
       return v?.kind !== "user";
-    }),
+    }).map(({ owner: _owner, ...call }) => call),
     resolved: Object.fromEntries(view.resolved),
     consensus: consensus(view, includeSim),
     history,
